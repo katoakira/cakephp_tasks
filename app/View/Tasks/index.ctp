@@ -1,5 +1,9 @@
 <?php echo $this->Html->link('新規タスク', '/Tasks/create'); ?>
 <h3><?php echo count($tasks_data); ?>件のタスクが未完了です</h3>
+<?php foreach ($tasks_data as $row): ?>
+<?php echo $this->element('task', array('task' => $row)) ?>
+<?php endforeach; ?>
+<!--
 <table>
     <tr>
         <th>ID</th>
@@ -14,7 +18,15 @@
             $row['Task']['id'],
             '/Tasks/view/' . $row['Task']['id']
         );?></td>
-        <td><?php echo h($row['Task']['name']); ?></td>
+        <td><?php echo h($row['Task']['name']); ?>
+        <br />
+            <ul>
+                <?php foreach ($row['Note'] as $note): ?>
+                   Noteモデルのデータ表示を追加
+                <li><?php echo h($note['body']); ?></li>
+                <?php endforeach; ?>
+            </ul>
+        </td>
         <td><?php echo h($row['Task']['due_date']); ?></td>
         <td><?php echo h($row['Task']['created']); ?></td>
         <td><?php echo $this->Html->link(
@@ -24,3 +36,4 @@
     </tr>
 <?php endforeach; ?>
 </table>
+-->

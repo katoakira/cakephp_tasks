@@ -46,25 +46,60 @@
             if ($this->request->is('post')) {
                 $data = array(
                     'name' => $this->request->data['name'],
+                    // bodyを追加
                     'body' => $this->request->data['body']
-
                 );
-                var_dump($data);
-                echo "<br />";
+  
                 // データを登録
-                $id = $this->Task->save($data);                
+                $id = $this->Task->save($data);   
+                if ($id === false) { // ifブロックを追加
+                    $this->render('create');
+                    return;
+                }             
                 $msg = sprintf(
                     'タスク %s を登録しました。',
                     $this->Task->id
                 );
-                var_dump($id);
-                echo "<br />";
-                var_dump($msg);
+
                 // メッセージを表示してリダイレクト
                 $this->Session->setFlash($msg);
                 $this->redirect('/Tasks/index');
                 return;
             }
             $this->render('create');
+        }
+
+        public function edit() {
+            // 指定されたタスクのデータを取得
+            $id = $this->request->pass[0];
+            $options = array(
+                'condition' => array(
+                    'Task.id' => $id,
+                    'Task.status' => 0
+                )
+            );
+            $task = $this->Task->find('first', $options);
+
+            // データが見つからない場合は一覧へ
+            if ($task == false) {
+                $this->Session->setFlash('タスクが見つかりません');
+                $this->redirect('/Tasks/index');
+            }
+
+            // フォームが送信された場合は更新にトライ
+            if ($this->request->is('post')) {
+                $data = array(
+                    'id' => $id,
+                    'name' => $this->request->data['Task']['name'],
+                    'body' => $this->request->data['Task']['body']
+                );
+                if ($this->Task->save($data)) {
+                    $this->Session->setFlash('更新しました');
+                    $this->redirect('/Task/index');
+                }
+            } else {
+                // POSTされていない場合は初期データをフォームにセット
+                $this->request->data = $task;
+            } 
         }
     }
